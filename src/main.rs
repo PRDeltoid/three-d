@@ -1,44 +1,100 @@
 extern crate image;
+extern crate tobj;
 
-fn draw_line(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, mut pos1: (u32, u32), mut pos2: (u32, u32), color: image::Rgb<u8>) {
+use std::path::Path;
+use std::sync::Arc;
 
-    if pos1.0 < pos2.0 {
-        let tmp = pos1;
-        pos1 = pos2;
-        pos2 = tmp;
+struct Face {
+    vertexes: Vec<(u32, u32, u32)>,
+}
+
+fn swap(x: &mut i32, y: &mut i32) {
+    let temp = *x;
+    *x = *y;
+    *y = temp;
+}
+
+fn draw_line(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, pos1: (u32, u32), pos2: (u32, u32), color: image::Rgb<u8>) {
+
+    //Extract positions into separate variables
+    let mut x1 = pos1.0 as i32;
+    let mut y1 = pos1.1 as i32;
+    let mut x2 = pos2.0 as i32;
+    let mut y2 = pos2.1 as i32;
+
+    //Determine if the line is steep (rises more than it runs)
+    //Transpose points if the line is steep (we'll draw like X is Y and Y is X)
+    let steep = (x1-x2).abs() < (y1-y2).abs();
+    if steep {
+        println!("Line is steep");
+        swap(&mut x1, &mut y1);
+        swap(&mut x2, &mut y2);
     }
-    let (x1, y1) = pos1;
-    let (x2, y2) = pos2;
+
+    //Swap so we always draw from left to right
+    if x1 > x2 { 
+        swap(&mut x1, &mut x2);
+        swap(&mut y1, &mut y2);
+    }
+
+    //Calculate the slope
+    let dy = y2 - y1;
+    let dx = x2 - x1;
+    
+    //Determine direction in which line moves on the y axis (up or down)
+    //If our y2 is greater than y1, we know we are drawing downwards and must increase Y
+    //Otherwise, we are drawing upwards, and we want to decrease Y
+    let sign: i32 = if y2 > y1 { 1 } else { -1 };
+
+    //Amount away from "perfect" line we'll move with every step in the X direction
+    let delta_err = (dy as f32/dx as f32).abs();
+
+
     println!("Outputting line from x: {}, y: {} to x: {}, y: {}", x1, y1, x2, y2);
 
-    let slope = (y1 as i32 - y2 as i32)/(x1 as i32 - x2 as i32);
-
-    println!("Slope: {}", slope);
-    let mut step: u32 = 1;
-    if slope == 0 {
-        step = 0;
-    } else if slope > 1 {
-        step = slope as u32;
-    } else if slope < 1 {
-        step = (slope as f32).powi(-1).round() as u32;
-    }
-    println!("Step: {}", step);
-    
-
-
+    //Draw the line
+    let mut error = 0.0;
     let mut y = y1;
-    for x in x2 .. x1 {
-        for _i in 0 .. step {
-            y+=1;
-            //println!("Placing pixel at x: {}, y: {}", x, y);
-            buf.put_pixel(x, y, color); //image::Rgb([255, 255, 255])); 
+    for x in x1 .. x2 {
+        //Place a pixel
+        if !steep {
+            buf.put_pixel(x as u32, y as u32, color);
+        } else {
+            //If it's steep, we must un-transpose our points
+            buf.put_pixel(y as u32, x as u32, color);
         }
+
+        //If we are too far from the ideal line, move our plotter in the Y direction
+        error += delta_err;
+        if error >= 0.5 {
+            y = y + sign;
+            error -= 1.0;
+        }
+    }
+
+}
+
+fn render(model: Arc<tobj::Model>, imgbuf: image::ImageBuffer<image::Rgb<u8>, Vec<u8>>) {
+    let faces: Vec<(u32, u32, u32)> = model.mesh.indices.chunks(3).map(|i| {
+        (i[0], i[1], i[2])
+    }).collect();
+
+    for face in faces {
+        let v1 = model.mesh.positions[face.0 as usize];
+        let v2 = model.mesh.positions[face.1 as usize];
+        let v3 = model.mesh.positions[face.2 as usize];
+
+        draw_line(&mut imgbuf, v1, v2, image::Rgb([255, 255, 255]))
 
     }
 
 }
 
 fn main() {
+
+    //Load model
+    let model = Arc::new(tobj::load_obj(&Path::new("obj/african_head.obj")));
+
     let x = 100;
     let y = 100;
     //Set all pixels to black
@@ -52,9 +108,9 @@ fn main() {
     imgbuf.put_pixel(99, 99, image::Rgb([0,0,255])); //blue
 
     //draw a test triangle
-    draw_line(&mut imgbuf, (20,20), (50, 50), image::Rgb([0,255,0])); //green
-    draw_line(&mut imgbuf, (50,50), (60, 20), image::Rgb([255,0,0])); //red
-    draw_line(&mut imgbuf, (60,20), (20, 20), image::Rgb([0,0,255])); //blue
+    draw_line(&mut imgbuf, (25,25), (50, 50), image::Rgb([0,255,0])); //green
+    draw_line(&mut imgbuf, (50,50), (75, 25), image::Rgb([255,0,0])); //red
+    draw_line(&mut imgbuf, (75,25), (25, 25), image::Rgb([0,0,255])); //blue
 
     imgbuf.save("test.ppm").unwrap();
 }

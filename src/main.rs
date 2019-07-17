@@ -74,26 +74,41 @@ fn draw_line(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, pos1: (u32, 
 
 }
 
-fn render(model: Arc<tobj::Model>, imgbuf: image::ImageBuffer<image::Rgb<u8>, Vec<u8>>) {
-    let faces: Vec<(u32, u32, u32)> = model.mesh.indices.chunks(3).map(|i| {
+fn render(mesh: &tobj::Mesh, imgbuf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>) {
+    let faces: Vec<(u32, u32, u32)> = mesh.indices.chunks(3).map(|i| {
         (i[0], i[1], i[2])
     }).collect();
 
-    for face in faces {
-        let v1 = model.mesh.positions[face.0 as usize];
-        let v2 = model.mesh.positions[face.1 as usize];
-        let v3 = model.mesh.positions[face.2 as usize];
+    println!("{:?}", &faces[0]);
 
-        draw_line(&mut imgbuf, v1, v2, image::Rgb([255, 255, 255]))
+
+    let triangles: Vec<(f32, f32, f32)> = faces.iter().map(|i| {
+        (mesh.positions[i.0 as usize], mesh.positions[i.1 as usize], mesh.positions[i.2 as usize])
+    }).collect();
+
+    println!("{:?}", &triangles[0..3]);
+
+    for triangle in triangles {
 
     }
+
+
+    /*for face in model.mesh.indices {
+        let v1 = (model.mesh.positions[(face as usize)*3], model.mesh.positions[(face as usize)*3+1]); //, model.mesh.positions[(face as usize)*3+2]);
+
+        //draw_line(&mut imgbuf, v1, v2, image::Rgb([255, 255, 255]))
+
+    }*/
 
 }
 
 fn main() {
 
-    //Load model
-    let model = Arc::new(tobj::load_obj(&Path::new("obj/african_head.obj")));
+    //Load file 
+    let file = tobj::load_obj(&Path::new("obj/african_head.obj"));
+
+    let (model, _) = file.unwrap();
+    let mesh = &model[0].mesh;
 
     let x = 100;
     let y = 100;
@@ -107,10 +122,13 @@ fn main() {
     imgbuf.put_pixel(99, 1, image::Rgb([255,0,0])); //red
     imgbuf.put_pixel(99, 99, image::Rgb([0,0,255])); //blue
 
-    //draw a test triangle
+    render(mesh, &mut imgbuf);
+
+    /*draw a test triangle
     draw_line(&mut imgbuf, (25,25), (50, 50), image::Rgb([0,255,0])); //green
     draw_line(&mut imgbuf, (50,50), (75, 25), image::Rgb([255,0,0])); //red
     draw_line(&mut imgbuf, (75,25), (25, 25), image::Rgb([0,0,255])); //blue
+    */
 
     imgbuf.save("test.ppm").unwrap();
 }

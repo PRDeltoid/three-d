@@ -2,11 +2,9 @@ extern crate image;
 extern crate tobj;
 
 use std::path::Path;
-use std::sync::Arc;
 
-struct Face {
-    vertexes: Vec<(u32, u32, u32)>,
-}
+static width: u32 = 500;
+static height: u32 = 500;
 
 fn swap(x: &mut i32, y: &mut i32) {
     let temp = *x;
@@ -75,30 +73,23 @@ fn draw_line(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, pos1: (u32, 
 }
 
 fn render(mesh: &tobj::Mesh, imgbuf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>) {
-    let faces: Vec<(u32, u32, u32)> = mesh.indices.chunks(3).map(|i| {
-        (i[0], i[1], i[2])
-    }).collect();
+    //For every 3 vertex indicies belonging to a face...
+    for face in mesh.indices.chunks(3) {
+        //Connect each vertex to its next neighbor
+        for i in 0..3 {
+            let v1 = (mesh.positions[(face[i] as usize)*3], mesh.positions[(face[i] as usize)*3+1]);
+            let v2 = (mesh.positions[(face[(i+1)%3] as usize)*3], mesh.positions[(face[(i+1)%3] as usize)*3+1]);
 
-    println!("{:?}", &faces[0]);
+            //println!("{:?} {:?}", v1, v2);
+            let x0 = ((v1.0 + 1.0)*(width as f32)/2.0) as u32; 
+            let y0 = ((v1.1 + 1.0)*(height as f32)/2.0) as u32; 
+            let x1 = ((v2.0 + 1.0)*(width as f32)/2.0) as u32; 
+            let y1 = ((v2.1 + 1.0)*(height as f32)/2.0) as u32; 
+            draw_line(imgbuf, (x0, y0), (x1, y1), image::Rgb([255, 255, 255]));
+        }
 
-
-    let triangles: Vec<(f32, f32, f32)> = faces.iter().map(|i| {
-        (mesh.positions[i.0 as usize], mesh.positions[i.1 as usize], mesh.positions[i.2 as usize])
-    }).collect();
-
-    println!("{:?}", &triangles[0..3]);
-
-    for triangle in triangles {
 
     }
-
-
-    /*for face in model.mesh.indices {
-        let v1 = (model.mesh.positions[(face as usize)*3], model.mesh.positions[(face as usize)*3+1]); //, model.mesh.positions[(face as usize)*3+2]);
-
-        //draw_line(&mut imgbuf, v1, v2, image::Rgb([255, 255, 255]))
-
-    }*/
 
 }
 
@@ -110,8 +101,8 @@ fn main() {
     let (model, _) = file.unwrap();
     let mesh = &model[0].mesh;
 
-    let x = 100;
-    let y = 100;
+    let x = width;
+    let y = height;
     //Set all pixels to black
     let mut imgbuf = image::ImageBuffer::from_fn(x, y, |_x,_y| {
         image::Rgb([0,0,0])

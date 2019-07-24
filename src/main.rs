@@ -2,9 +2,10 @@ extern crate image;
 extern crate tobj;
 
 use std::path::Path;
+use std::cmp;
 
-static width: u32 = 500;
-static height: u32 = 500;
+static WIDTH: u32 = 1000;
+static HEIGHT: u32 = 1000;
 
 fn swap(x: &mut i32, y: &mut i32) {
     let temp = *x;
@@ -80,14 +81,20 @@ fn render(mesh: &tobj::Mesh, imgbuf: &mut image::ImageBuffer<image::Rgb<u8>, Vec
             let v1 = (mesh.positions[(face[i] as usize)*3], mesh.positions[(face[i] as usize)*3+1]);
             let v2 = (mesh.positions[(face[(i+1)%3] as usize)*3], mesh.positions[(face[(i+1)%3] as usize)*3+1]);
 
-            //println!("{:?} {:?}", v1, v2);
-            let x0 = ((v1.0 + 1.0)*(width as f32)/2.0) as u32; 
-            let y0 = ((v1.1 + 1.0)*(height as f32)/2.0) as u32; 
-            let x1 = ((v2.0 + 1.0)*(width as f32)/2.0) as u32; 
-            let y1 = ((v2.1 + 1.0)*(height as f32)/2.0) as u32; 
+
+            println!("{:?} {:?}", v1, v2);
+            let x0 = ((v1.0 + 1.0)*(WIDTH as f32)/2.0) as u32; 
+            let y0 = ((v1.1 + 1.0)*(HEIGHT as f32)/2.0) as u32; 
+            let x1 = ((v2.0 + 1.0)*(WIDTH as f32)/2.0) as u32; 
+            let y1 = ((v2.1 + 1.0)*(HEIGHT as f32)/2.0) as u32; 
+
+            //Make sure the values don't hit the bounds of our picture
+            let x0 = std::cmp::min(x0, WIDTH-1);
+            let y0 = std::cmp::min(y0, HEIGHT-1);
+            let x1 = std::cmp::min(x1, WIDTH-1);
+            let y1 = std::cmp::min(y1, HEIGHT-1);
             draw_line(imgbuf, (x0, y0), (x1, y1), image::Rgb([255, 255, 255]));
         }
-
 
     }
 
@@ -101,25 +108,17 @@ fn main() {
     let (model, _) = file.unwrap();
     let mesh = &model[0].mesh;
 
-    let x = width;
-    let y = height;
     //Set all pixels to black
-    let mut imgbuf = image::ImageBuffer::from_fn(x, y, |_x,_y| {
+    let mut imgbuf = image::ImageBuffer::from_fn(WIDTH, HEIGHT, |_x,_y| {
         image::Rgb([0,0,0])
     });
 
-    //output orientation pixels
+    /*output orientation pixels
     imgbuf.put_pixel(1, 1, image::Rgb([0,255,0])); //green
     imgbuf.put_pixel(99, 1, image::Rgb([255,0,0])); //red
-    imgbuf.put_pixel(99, 99, image::Rgb([0,0,255])); //blue
+    imgbuf.put_pixel(99, 99, image::Rgb([0,0,255])); //blue*/
 
     render(mesh, &mut imgbuf);
-
-    /*draw a test triangle
-    draw_line(&mut imgbuf, (25,25), (50, 50), image::Rgb([0,255,0])); //green
-    draw_line(&mut imgbuf, (50,50), (75, 25), image::Rgb([255,0,0])); //red
-    draw_line(&mut imgbuf, (75,25), (25, 25), image::Rgb([0,0,255])); //blue
-    */
 
     imgbuf.save("test.ppm").unwrap();
 }

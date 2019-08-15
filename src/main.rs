@@ -13,6 +13,91 @@ fn swap(x: &mut i32, y: &mut i32) {
     *y = temp;
 }
 
+struct Screen_Coordinate { 
+    x: u32,
+    y: u32
+}
+
+struct Bounding_Box {
+    min_values: (u32, u32),
+    max_values: (u32, u32)
+}
+
+//Finds the bounding box of a given triangle formed by 3 screen coordinates (x,y)
+fn find_bounding_box(vertexes: Vec<Screen_Coordinate>) -> Bounding_Box {
+    Bounding_Box {
+        min_values: find_min(&vertexes),
+        max_values: find_max(&vertexes)
+    }
+
+
+}
+
+//Find the minimum x and y values for a given triangle (lower bounding box)
+fn find_min(values: &Vec<Screen_Coordinate>) -> (u32, u32) {
+    let mut min_x_val = 0;
+    let mut min_y_val = 0;
+    for val in values {
+        if val.x < min_x_val {
+            min_x_val = val.x;
+        }
+
+        if val.y < min_y_val {
+            min_y_val = val.y;
+        }
+    }
+    (min_x_val, min_y_val)
+}
+
+//Find the maximum x and y values for a given triangle (upper bounding box)
+fn find_max(values: &Vec<Screen_Coordinate>) -> (u32, u32) {
+    let mut max_x_val = 0; // WIDTH-1;
+    let mut max_y_val = 0; //HEIGHT-1;
+    for val in values {
+        if val.x > max_x_val {
+            max_x_val = val.x;
+        }
+
+        if val.y > max_y_val {
+            max_y_val = val.y;
+        }
+    }
+    (max_x_val, max_y_val)
+}
+
+//Converts (x,y,z) world coordinates to screen (pixel) coordinates (x,y)
+fn find_screen_coords(vertex: &(f32, f32, f32)) -> Screen_Coordinate {
+    let x = ((vertex.0 + 1.0)*(WIDTH as f32/2.0)) as u32;
+    let y = ((vertex.1 + 1.0)*(HEIGHT as f32/2.0)) as u32;
+
+    let x = std::cmp::min(x, WIDTH-1);
+    let y = std::cmp::max(y, HEIGHT-1);
+
+    Screen_Coordinate {
+        x,
+        y
+    }
+
+}
+
+fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, vertexes: Vec<(f32, f32, f32)>) {
+
+    //Convert our vertexes to screen coordinates (x,y)
+    let screen_vertexes = vertexes.iter().map(|v| {
+        find_screen_coords(v)
+    }).collect();
+        
+    //Find our triangle's bounding box
+    let bb = find_bounding_box(screen_vertexes);
+
+    for x in (bb.min_values.0..bb.max_values.0) {
+        for y in (bb.min_values.1..bb.max_values.1) {
+            //For each pixel in the bounding box, compute barycentric coordinates
+        }
+    }
+
+}
+
 fn draw_line(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, pos1: (u32, u32), pos2: (u32, u32), color: image::Rgb<u8>) {
 
     //Extract positions into separate variables
@@ -76,25 +161,14 @@ fn draw_line(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, pos1: (u32, 
 fn render(mesh: &tobj::Mesh, imgbuf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>) {
     //For every 3 vertex indicies belonging to a face...
     for face in mesh.indices.chunks(3) {
-        //Connect each vertex to its next neighbor
-        for i in 0..3 {
-            let v1 = (mesh.positions[(face[i] as usize)*3], mesh.positions[(face[i] as usize)*3+1]);
-            let v2 = (mesh.positions[(face[(i+1)%3] as usize)*3], mesh.positions[(face[(i+1)%3] as usize)*3+1]);
+        //Build a vector containing a tuple of their (x, y, z) values
+        let vertexes: Vec<(f32, f32, f32)> = (0..3).map(|i| {
+            let index = face[i] as usize;
+             (mesh.positions[index], mesh.positions[index+1], mesh.positions[index+2])
+        }).collect();
 
-
-            println!("{:?} {:?}", v1, v2);
-            let x0 = ((v1.0 + 1.0)*(WIDTH as f32)/2.0) as u32; 
-            let y0 = ((v1.1 + 1.0)*(HEIGHT as f32)/2.0) as u32; 
-            let x1 = ((v2.0 + 1.0)*(WIDTH as f32)/2.0) as u32; 
-            let y1 = ((v2.1 + 1.0)*(HEIGHT as f32)/2.0) as u32; 
-
-            //Make sure the values don't hit the bounds of our picture
-            let x0 = std::cmp::min(x0, WIDTH-1);
-            let y0 = std::cmp::min(y0, HEIGHT-1);
-            let x1 = std::cmp::min(x1, WIDTH-1);
-            let y1 = std::cmp::min(y1, HEIGHT-1);
-            draw_line(imgbuf, (x0, y0), (x1, y1), image::Rgb([255, 255, 255]));
-        }
+        //Render the triangle created by the 3 vertexes
+        draw_triangle(imgbuf, vertexes);
 
     }
 
@@ -120,6 +194,6 @@ fn main() {
 
     render(mesh, &mut imgbuf);
 
-    imgbuf.save("test.ppm").unwrap();
+    imgbuf.save("test.png").unwrap();
 }
 

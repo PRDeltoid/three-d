@@ -19,10 +19,10 @@ pub fn render(mesh: &tobj::Mesh, imgbuf: &mut image::ImageBuffer<image::Rgb<u8>,
     }
 }
 
-fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, vertexes: Vec<Vec3f>) {
+fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle: Triangle) { //vertexes: Vec<Vec3f>) {
 
     //Convert our vertexes to screen coordinates (x,y)
-    let screen_vertexes = vertexes.iter().map(|v| {
+    let screen_vertexes = triangle.iter().map(|v| {
         find_screen_coordinates(&v, buf.width(), buf.height() )
     }).collect();
 
@@ -31,6 +31,7 @@ fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, vertexes
 
     for x in (bb.min_values.x..bb.max_values.x) {
         for y in (bb.min_values.y..bb.max_values.y) {
+            let vec = barycentric(triangle, Vec2i {x,y});
             //For each pixel in the bounding box, compute barycentric coordinates
         }
     }

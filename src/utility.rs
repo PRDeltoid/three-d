@@ -5,7 +5,7 @@ pub struct BoundingBox {
     pub max_values: Vec2i
 }
 
-//Finds the bounding box of a given triangle formed by 2 screen coordinates (x,y)
+/// Find the bounding box of a given triangle formed by 2 screen coordinates (x,y)
 pub fn find_bounding_box(vertexes: Vec<Vec2i>) -> BoundingBox
 {
     BoundingBox {

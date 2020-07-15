@@ -1,14 +1,26 @@
-use std::num;
+use std::fmt;
 
 pub struct Vec2i {
     pub x: i32,
     pub y: i32
 }
 
+impl fmt::Display for Vec2i {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_fmt(format_args!("X: {0}, Y: {1}", self.x, self.y))
+    }
+}
+
 pub struct Vec3f {
     pub x: f32,
     pub y: f32,
     pub z: f32
+}
+
+impl fmt::Display for Vec3f {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_fmt(format_args!("X: {0}, Y: {1}, Z: {2}", self.x, self.y, self.z))
+    }
 }
 
 pub struct Triangle {
@@ -18,10 +30,10 @@ pub struct Triangle {
 }
 
 /// Find the minimum x and y values for a given triangle (lower bounding box)
-pub fn find_min(values: &Vec<Vec2i>) -> Vec2i {
+pub fn find_min(values: &Triangle) -> Vec2i {
     let mut min_x_val = -1;
     let mut min_y_val = -1;
-    for val in values {
+    for val in [&values.point_1, &values.point_2, &values.point_3].iter() {
         if val.x < min_x_val {
             min_x_val = val.x;
         }
@@ -38,10 +50,10 @@ pub fn find_min(values: &Vec<Vec2i>) -> Vec2i {
 }
 
 /// Find the maximum x and y values for a given triangle (upper bounding box)
-pub fn find_max(values: &Vec<Vec2i>) -> Vec2i {
+pub fn find_max(values: &Triangle) -> Vec2i {
     let mut max_x_val = -1; // WIDTH-1;
     let mut max_y_val = -1; //HEIGHT-1;
-    for val in values {
+    for val in [&values.point_1, &values.point_2, &values.point_3].iter() {
         if val.x > max_x_val {
             max_x_val = val.x;
         }
@@ -67,7 +79,7 @@ fn cross(vec1: Vec3f, vec2: Vec3f) -> Vec3f {
 }
 
 /// Computes the barycentric coordinates of a given set of vectors and a point
-pub fn barycentric(triangle: Triangle, point: Vec2i) -> Vec3f
+pub fn barycentric(triangle: &Triangle, point: Vec2i) -> Vec3f
 {
     let u: Vec3f = cross(Vec3f {
         x: (triangle.point_2.x - triangle.point_1.x) as f32,

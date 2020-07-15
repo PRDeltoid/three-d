@@ -34,14 +34,14 @@ pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32
     // Render each triangle
     // For each 3 indices representing the vertexes of a triangle face
     for vertex_indexes in mesh.indices.chunks(3) {
-        println!("Face indexes: {}/{}/{}", vertex_indexes[0], vertex_indexes[1], vertex_indexes[2]);
+        //println!("Face indexes: {}/{}/{}", vertex_indexes[0], vertex_indexes[1], vertex_indexes[2]);
 
         //Get the exact [x,y,z] position for each vertex in face using the indexes
         let vertexes: Vec<Vec3f> = (0..3).map(|i| {
             let vertex_1_index = vertex_indexes[i] as usize * 3;
             let vertex_2_index = vertex_indexes[i] as usize * 3 + 1;
             let vertex_3_index = vertex_indexes[i] as usize * 3 + 2;
-            println!("Vertex {}: {} ({}), {} ({}),  {} ({})", vertex_indexes[i], vertex_1_index, mesh.positions[vertex_1_index], vertex_2_index, mesh.positions[vertex_2_index], vertex_3_index, mesh.positions[vertex_3_index]);
+            //println!("Vertex {}: {} ({}), {} ({}),  {} ({})", vertex_indexes[i], vertex_1_index, mesh.positions[vertex_1_index], vertex_2_index, mesh.positions[vertex_2_index], vertex_3_index, mesh.positions[vertex_3_index]);
             //mesh.positions if flattened, so each index points to the start of 3 vertexes of the given face in the positions vector.
             //  Because it is flattened, we can get the other two vertexes of the face by simply adding 1 and 2 to the index
             Vec3f {
@@ -69,7 +69,7 @@ pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32
 }
 
 /// Draw a triangle on the image buffer
-fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle: Triangle) { //vertexes: Vec<Vec3f>) {
+fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle: Triangle) {
 
     let mut rng = rand::thread_rng();
     if triangle.point_1.x < 0 || triangle.point_1.y < 0 { return; }

@@ -82,7 +82,7 @@ fn cross(vec1: Vec3f, vec2: Vec3f) -> Vec3f {
 pub fn barycentric(triangle: &Triangle, point: Vec2i) -> Vec3f
 {
     let u: Vec3f = cross(Vec3f {
-        x: (triangle.point_2.x - triangle.point_1.x) as f32,
+        x: (triangle.point_3.x - triangle.point_1.x) as f32,
         y: (triangle.point_2.x - triangle.point_1.x) as f32,
         z: (triangle.point_1.x - point.x) as f32
     },

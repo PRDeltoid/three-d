@@ -7,8 +7,8 @@ extern crate tobj;  //TObj file loader library
 
 use std::path::Path;  //Used for locate TObj file in filesystem
 
-static WIDTH: u32 = 1000;
-static HEIGHT: u32 = 1000;
+static WIDTH: u32 = 500;
+static HEIGHT: u32 = 500;
 
 fn main() {
 

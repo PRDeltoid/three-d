@@ -11,6 +11,7 @@ pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32
     let (model, _) = object.unwrap();
     let mesh = &model[0].mesh;
 
+
     //Set all pixels to black
     let mut imgbuf: RgbImage = ImageBuffer::from_fn(width, height, |_x, _y| {
         image::Rgb([0, 0, 0])
@@ -58,8 +59,17 @@ pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32
             point_3: find_screen_coordinates(&vertexes[2],imgbuf.width(), imgbuf.height())
         };
 
+        let triangle_normal = cross(vertexes[2] - vertexes[0] , vertexes[1] - vertexes[0]).normalize();
+
+        let light_direction = Vec3f { x: 0.0, y: 0.0, z: -1.0 };
+        let intensity = dot(triangle_normal, light_direction);
+
         //Render the triangle
-        draw_triangle(&mut imgbuf, triangle);
+        //let mut rng = rand::thread_rng();
+        if intensity > 0.0 {
+            let color = [(intensity * 255.0) as u8, (intensity * 255.0) as u8, (intensity * 255.0) as u8];
+            draw_triangle(&mut imgbuf, triangle, color);
+        }
     }
 
     // Flip the image
@@ -69,9 +79,8 @@ pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32
 }
 
 /// Draw a triangle on the image buffer
-fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle: Triangle) {
+fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle: Triangle, color: [u8; 3]) {
 
-    let mut rng = rand::thread_rng();
     if triangle.point_1.x < 0 || triangle.point_1.y < 0 { return; }
     if triangle.point_2.x < 0 || triangle.point_2.y < 0 { return; }
     if triangle.point_3.x < 0 || triangle.point_3.y < 0 { return; }
@@ -82,7 +91,7 @@ fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle
     //Find our triangle's bounding box
     let bb = find_bounding_box(&triangle);
 
-    let color: [u8 ; 3] = [rng.gen::<u8>() % 255, rng.gen::<u8>() % 255, rng.gen::<u8>() % 255];
+    //color = [rng.gen::<u8>() % 255, rng.gen::<u8>() % 255, rng.gen::<u8>() % 255];
 
     for x in bb.min_values.x..bb.max_values.x {
         for y in bb.min_values.y..bb.max_values.y {

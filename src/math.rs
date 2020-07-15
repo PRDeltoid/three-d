@@ -1,4 +1,5 @@
 use std::fmt;
+use std::ops;
 
 pub struct Vec2i {
     pub x: i32,
@@ -11,15 +12,55 @@ impl fmt::Display for Vec2i {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Vec3f {
     pub x: f32,
     pub y: f32,
     pub z: f32
 }
 
+impl Vec3f {
+    fn norm(&self) -> f32 {
+        (self.x*self.x + self.y*self.y + self.z * self.z).sqrt()
+    }
+
+    pub fn normalize(&self) -> Vec3f {
+        Vec3f 
+        {
+            x: self.x * (1.0 / self.norm()),
+            y: self.y * (1.0 / self.norm()),
+            z: self.z * (1.0 / self.norm()),
+        }
+    }
+}
+
 impl fmt::Display for Vec3f {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         formatter.write_fmt(format_args!("X: {0}, Y: {1}, Z: {2}", self.x, self.y, self.z))
+    }
+}
+
+impl ops::Sub<Vec3f> for Vec3f {
+    type Output = Vec3f;
+
+    fn sub(self, rhs: Vec3f) -> Vec3f {
+        Vec3f {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
+    }
+}
+
+impl ops::Mul<Vec3f> for Vec3f {
+    type Output = Vec3f;
+
+    fn mul(self, rhs: Vec3f) -> Vec3f {
+        Vec3f {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
     }
 }
 
@@ -70,12 +111,16 @@ pub fn find_max(values: &Triangle) -> Vec2i {
 }
 
 /// Cross Product of two 3-component vectors
-fn cross(vec1: Vec3f, vec2: Vec3f) -> Vec3f {
+pub fn cross(vec1: Vec3f, vec2: Vec3f) -> Vec3f {
     Vec3f {
         x: vec1.y * vec2.z - vec1.z * vec2.y,
         y: vec1.z * vec2.x - vec1.x * vec2.z,
         z: vec1.x * vec2.y - vec1.y * vec2.x
     }
+}
+
+pub fn dot(vec1: Vec3f, vec2: Vec3f) -> f32 {
+    (vec1.x * vec2.x) + (vec1.y * vec2.y) + (vec1.z * vec2.z)
 }
 
 /// Computes the barycentric coordinates of a given set of vectors and a point

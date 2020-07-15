@@ -23,10 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cc2327e1-67e6-45a3-8a9b-81f5666db812" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/obj/teapot.obj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/math.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/math.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/render.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/render.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utility.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility.rs" afterDir="false" />
     </list>
@@ -125,7 +124,14 @@
       <option name="project" value="LOCAL" />
       <updated>1594183902840</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Get program to compile&#10;&#10;Fix errors preventing program from compiling. However, the program does not render correctly yet.">
+      <created>1594788770590</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1594788770590</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -144,36 +150,41 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Refactor into modules" />
     <MESSAGE value="Implement Barycentric and Cross Product function" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement Barycentric and Cross Product function" />
+    <MESSAGE value="Get program to compile&#10;&#10;Fix errors preventing program from compiling. However, the program does not render correctly yet." />
+    <option name="LAST_COMMIT_MESSAGE" value="Get program to compile&#10;&#10;Fix errors preventing program from compiling. However, the program does not render correctly yet." />
   </component>
   <component name="WindowStateProjectService">
-    <state width="1877" height="190" key="GridCell.Tab.0.bottom" timestamp="1594787246964">
+    <state x="740" y="280" key="FileChooserDialogImpl" timestamp="1594793300393">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="190" key="GridCell.Tab.0.bottom/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594787246964" />
-    <state width="1877" height="190" key="GridCell.Tab.0.center" timestamp="1594787246964">
+    <state x="740" y="280" key="FileChooserDialogImpl/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594793300393" />
+    <state width="1877" height="190" key="GridCell.Tab.0.bottom" timestamp="1594795112397">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="190" key="GridCell.Tab.0.center/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594787246964" />
-    <state width="1877" height="190" key="GridCell.Tab.0.left" timestamp="1594787246964">
+    <state width="1877" height="190" key="GridCell.Tab.0.bottom/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594795112397" />
+    <state width="1877" height="190" key="GridCell.Tab.0.center" timestamp="1594795112397">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="190" key="GridCell.Tab.0.left/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594787246964" />
-    <state width="1877" height="190" key="GridCell.Tab.0.right" timestamp="1594787246964">
+    <state width="1877" height="190" key="GridCell.Tab.0.center/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594795112397" />
+    <state width="1877" height="190" key="GridCell.Tab.0.left" timestamp="1594795112397">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state width="1877" height="190" key="GridCell.Tab.0.right/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594787246964" />
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1594183905970">
+    <state width="1877" height="190" key="GridCell.Tab.0.left/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594795112397" />
+    <state width="1877" height="190" key="GridCell.Tab.0.right" timestamp="1594795112397">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594183905970" />
+    <state width="1877" height="190" key="GridCell.Tab.0.right/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594795112397" />
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1594788772804">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594788772804" />
     <state x="616" y="243" width="672" height="677" key="run.anything.popup" timestamp="1594777796954">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="616" y="243" width="672" height="677" key="run.anything.popup/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594777796954" />
-    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup" timestamp="1594787057919">
+    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup" timestamp="1594794056482">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594787057919" />
+    <state x="623" y="227" width="672" height="678" key="search.everywhere.popup/0.0.1920.1050/1920.0.1920.1050@0.0.1920.1050" timestamp="1594794056482" />
   </component>
 </project>

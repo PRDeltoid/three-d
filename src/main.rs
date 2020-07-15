@@ -13,12 +13,9 @@ static HEIGHT: u32 = 1000;
 fn main() {
 
     //Load file 
-    let object = tobj::load_obj(&Path::new("obj/african_head.obj"), true);
-    //let file = tobj::load_obj(&Path::new("obj/teapot.obj"));
-
+    let object = tobj::load_obj(Path::new("obj/african_head.obj"), true);
+    //let object = tobj::load_obj(&Path::new("obj/teapot.obj"), true);
 
     render::render(object, WIDTH, HEIGHT, "test.png");
-
-
 }
 

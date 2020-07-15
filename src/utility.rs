@@ -20,13 +20,6 @@ pub fn find_screen_coordinates(vertex: &Vec3f, width: u32, height: u32) -> Vec2i
 
     let x = ((vertex.x + 1.0) * width as f32 / 2.0) as i32;
     let y = ((vertex.y + 1.0) * height as f32 / 2.0) as i32;
-    //println!("Unbound coordinates: x: {} y: {}", x, y);
-
-    /*let x = std::cmp::min(x, width as i32 - 1);
-    let x = std::cmp::max(x, 0);
-    let y = std::cmp::min(y, height as i32 - 1);
-    let y = std::cmp::max(y, 0);*/
-    //println!("Bounded coordinates: x: {} y: {}", x, y);
 
     Vec2i {
         x,

@@ -2,23 +2,24 @@ use crate::utility::*;
 use crate::math::*;
 
 use rand::prelude::*;
-use image::{RgbImage, ImageBuffer};
+use image::{RgbImage, ImageBuffer, imageops};
+use tobj::{Model, LoadError, Material};
 
 /// Render a flat image from a OBJ mesh
-pub fn render(object: &tobj::LoadResult, width: u32, height: u32, filename: &str) {
+pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32, height: u32, filename: &str) {
     //Unpack the loaded object
     let (model, _) = object.unwrap();
     let mesh = &model[0].mesh;
 
     //Set all pixels to black
-    let mut imgbuf: RgbImage = ImageBuffer::from_fn(width, height, |_x,_y| {
-        image::Rgb([0,0,0])
+    let mut imgbuf: RgbImage = ImageBuffer::from_fn(width, height, |_x, _y| {
+        image::Rgb([0, 0, 0])
     });
 
     //draw_orientation_marks(&mut imgbuf);
 
     //For every 3 vertex indices belonging to a face...
-    for face in mesh.indices.chunks(3) {
+    /*for face in mesh.indices.chunks(3) {
         println!("Face: {} {} {}", face[0], face[1], face[2]);
         //Build a vector containing a collection of all vertexes (x, y, z) values
         let vertexes: Vec<Vec3f> = (0..3).map(|i| {
@@ -28,19 +29,42 @@ pub fn render(object: &tobj::LoadResult, width: u32, height: u32, filename: &str
                 y: mesh.positions[index + 1],
                 z: mesh.positions[index + 2]
             }
+        }).collect();*/
+
+    // Render each triangle
+    // For each 3 indices representing the vertexes of a triangle face
+    for vertex_indexes in mesh.indices.chunks(3) {
+        println!("Face indexes: {}/{}/{}", vertex_indexes[0], vertex_indexes[1], vertex_indexes[2]);
+
+        //Get the exact [x,y,z] position for each vertex in face using the indexes
+        let vertexes: Vec<Vec3f> = (0..3).map(|i| {
+            let vertex_1_index = vertex_indexes[i] as usize * 3;
+            let vertex_2_index = vertex_indexes[i] as usize * 3 + 1;
+            let vertex_3_index = vertex_indexes[i] as usize * 3 + 2;
+            println!("Vertex {}: {} ({}), {} ({}),  {} ({})", vertex_indexes[i], vertex_1_index, mesh.positions[vertex_1_index], vertex_2_index, mesh.positions[vertex_2_index], vertex_3_index, mesh.positions[vertex_3_index]);
+            //mesh.positions if flattened, so each index points to the start of 3 vertexes of the given face in the positions vector.
+            //  Because it is flattened, we can get the other two vertexes of the face by simply adding 1 and 2 to the index
+            Vec3f {
+                x: mesh.positions[vertex_1_index],
+                y: mesh.positions[vertex_2_index],
+                z: mesh.positions[vertex_3_index]
+            }
         }).collect();
 
+        //Construct a triangle from the 3 [x,y,z] vertexes of each face
         let triangle = Triangle {
             point_1: find_screen_coordinates(&vertexes[0],imgbuf.width(), imgbuf.height()),
             point_2: find_screen_coordinates(&vertexes[1],imgbuf.width(), imgbuf.height()),
             point_3: find_screen_coordinates(&vertexes[2],imgbuf.width(), imgbuf.height())
         };
 
-        //Render the triangle created by the 3 vertexes
+        //Render the triangle
         draw_triangle(&mut imgbuf, triangle);
     }
 
-    //Save the image
+    // Flip the image
+    let imgbuf = imageops::rotate180(&imgbuf);
+    // Save the image
     imgbuf.save(filename).unwrap();
 }
 
@@ -71,6 +95,7 @@ fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle
 }
 
 /// Draw 3 different colored pixels in each corner to test orientation
+#[allow(dead_code)]
 fn draw_orientation_marks(imgbuf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>) {
     // output orientation pixels
     imgbuf.put_pixel(1, 1, image::Rgb([0,255,0]));      //green

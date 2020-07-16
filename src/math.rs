@@ -119,13 +119,13 @@ pub fn cross(vec1: Vec3f, vec2: Vec3f) -> Vec3f {
     }
 }
 
+/// Dot Product (Scalar) of two 3-component vectors
 pub fn dot(vec1: Vec3f, vec2: Vec3f) -> f32 {
     (vec1.x * vec2.x) + (vec1.y * vec2.y) + (vec1.z * vec2.z)
 }
 
 /// Computes the barycentric coordinates of a given set of vectors and a point
-pub fn barycentric(triangle: &Triangle, point: Vec2i) -> Vec3f
-{
+pub fn barycentric(triangle: &Triangle, point: Vec2i) -> Vec3f {
     let u: Vec3f = cross(Vec3f {
         x: (triangle.point_3.x - triangle.point_1.x) as f32,
         y: (triangle.point_2.x - triangle.point_1.x) as f32,

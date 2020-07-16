@@ -1,36 +1,23 @@
 use crate::utility::*;
 use crate::math::*;
 
-use rand::prelude::*;
 use image::{RgbImage, ImageBuffer, imageops};
 use tobj::{Model, LoadError, Material};
 
 /// Render a flat image from a OBJ mesh
 pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32, height: u32, filename: &str) {
-    //Unpack the loaded object
+    //Unpack the loaded 3d object
     let (model, _) = object.unwrap();
+
+    //Unpack the first models mesh (we will add multi-model rendering later)
     let mesh = &model[0].mesh;
 
-
-    //Set all pixels to black
+    //Set all background pixels to black
     let mut imgbuf: RgbImage = ImageBuffer::from_fn(width, height, |_x, _y| {
         image::Rgb([0, 0, 0])
     });
 
     //draw_orientation_marks(&mut imgbuf);
-
-    //For every 3 vertex indices belonging to a face...
-    /*for face in mesh.indices.chunks(3) {
-        println!("Face: {} {} {}", face[0], face[1], face[2]);
-        //Build a vector containing a collection of all vertexes (x, y, z) values
-        let vertexes: Vec<Vec3f> = (0..3).map(|i| {
-            let index = face[i] as usize;
-            Vec3f {
-                x: mesh.positions[index],
-                y: mesh.positions[index + 1],
-                z: mesh.positions[index + 2]
-            }
-        }).collect();*/
 
     // Render each triangle
     // For each 3 indices representing the vertexes of a triangle face
@@ -43,6 +30,7 @@ pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32
             let vertex_2_index = vertex_indexes[i] as usize * 3 + 1;
             let vertex_3_index = vertex_indexes[i] as usize * 3 + 2;
             //println!("Vertex {}: {} ({}), {} ({}),  {} ({})", vertex_indexes[i], vertex_1_index, mesh.positions[vertex_1_index], vertex_2_index, mesh.positions[vertex_2_index], vertex_3_index, mesh.positions[vertex_3_index]);
+
             //mesh.positions if flattened, so each index points to the start of 3 vertexes of the given face in the positions vector.
             //  Because it is flattened, we can get the other two vertexes of the face by simply adding 1 and 2 to the index
             Vec3f {
@@ -59,15 +47,22 @@ pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, width: u32
             point_3: find_screen_coordinates(&vertexes[2],imgbuf.width(), imgbuf.height())
         };
 
-        let triangle_normal = cross(vertexes[2] - vertexes[0] , vertexes[1] - vertexes[0]).normalize();
+        //We need to determine the intensity with which light hits the surface to determine it's brightness
+        // The closer to parallel the triangle normal is to the light vector, the brighter the face will be
 
+        //Firwst, normalize the cross produce of the triangle to get the triangle normal vector
+        let triangle_normal = cross(vertexes[2] - vertexes[0] , vertexes[1] - vertexes[0]).normalize();
+        //Second, construct a hardcoded light coming from the viewport
         let light_direction = Vec3f { x: 0.0, y: 0.0, z: -1.0 };
+        //Third, determine the scalar/length of the triangle normal vector and light vector
         let intensity = dot(triangle_normal, light_direction);
 
-        //Render the triangle
-        //let mut rng = rand::thread_rng();
+        //Finally, render the triangle if any amount of light is hitting its face
         if intensity > 0.0 {
+            // Construct a grey-scale color based on the intensity of light hitting the face
             let color = [(intensity * 255.0) as u8, (intensity * 255.0) as u8, (intensity * 255.0) as u8];
+
+            // Draw the triangle on the screen
             draw_triangle(&mut imgbuf, triangle, color);
         }
     }
@@ -84,9 +79,9 @@ fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle
     if triangle.point_1.x < 0 || triangle.point_1.y < 0 { return; }
     if triangle.point_2.x < 0 || triangle.point_2.y < 0 { return; }
     if triangle.point_3.x < 0 || triangle.point_3.y < 0 { return; }
-    if triangle.point_1.x > 999  || triangle.point_1.y > 999 { return; }
-    if triangle.point_2.x > 999  || triangle.point_2.y > 999 { return; }
-    if triangle.point_3.x > 999  || triangle.point_3.y > 999 { return; }
+    if triangle.point_1.x > 499  || triangle.point_1.y > 499 { return; }
+    if triangle.point_2.x > 499  || triangle.point_2.y > 499 { return; }
+    if triangle.point_3.x > 499  || triangle.point_3.y > 499 { return; }
     //println!("Printing triangle [P1: ({0}), P2: ({1}), P3: ({2})]", triangle.point_1, triangle.point_2, triangle.point_3);
     //Find our triangle's bounding box
     let bb = find_bounding_box(&triangle);

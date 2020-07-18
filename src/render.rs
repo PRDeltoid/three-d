@@ -1,7 +1,7 @@
 use crate::utility::*;
 use crate::math::*;
 
-use image::{RgbImage, ImageBuffer, imageops, Pixel, RGB};
+use image::{RgbImage, ImageBuffer, imageops};
 use tobj::{Model, LoadError, Material};
 
 struct TriangleTexture {

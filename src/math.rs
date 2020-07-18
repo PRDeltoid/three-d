@@ -1,6 +1,12 @@
 use std::fmt;
 use std::ops;
 
+#[derive(Clone, Copy)]
+pub struct Vec2f {
+    pub x: f32,
+    pub y: f32
+}
+
 pub struct Vec2i {
     pub x: i32,
     pub y: i32
@@ -64,14 +70,20 @@ impl ops::Mul<Vec3f> for Vec3f {
     }
 }
 
-pub struct Triangle {
+pub struct Triangle3d {
+    pub vertex_1: Vec3f,
+    pub vertex_2: Vec3f,
+    pub vertex_3: Vec3f
+}
+
+pub struct Triangle2d {
     pub point_1: Vec2i,
     pub point_2: Vec2i,
     pub point_3: Vec2i
 }
 
 /// Find the minimum x and y values for a given triangle (lower bounding box)
-pub fn find_min(values: &Triangle) -> Vec2i {
+pub fn find_min(values: &Triangle2d) -> Vec2i {
     let mut min_x_val = -1;
     let mut min_y_val = -1;
     for val in [&values.point_1, &values.point_2, &values.point_3].iter() {
@@ -91,7 +103,7 @@ pub fn find_min(values: &Triangle) -> Vec2i {
 }
 
 /// Find the maximum x and y values for a given triangle (upper bounding box)
-pub fn find_max(values: &Triangle) -> Vec2i {
+pub fn find_max(values: &Triangle2d) -> Vec2i {
     let mut max_x_val = -1; // WIDTH-1;
     let mut max_y_val = -1; //HEIGHT-1;
     for val in [&values.point_1, &values.point_2, &values.point_3].iter() {
@@ -125,7 +137,7 @@ pub fn dot(vec1: Vec3f, vec2: Vec3f) -> f32 {
 }
 
 /// Computes the barycentric coordinates of a given set of vectors and a point
-pub fn barycentric(triangle: &Triangle, point: Vec2i) -> Vec3f {
+pub fn barycentric(triangle: &Triangle2d, point: Vec2i) -> Vec3f {
     let u: Vec3f = cross(Vec3f {
         x: (triangle.point_3.x - triangle.point_1.x) as f32,
         y: (triangle.point_2.x - triangle.point_1.x) as f32,

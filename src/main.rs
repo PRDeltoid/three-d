@@ -14,9 +14,10 @@ fn main() {
 
     //Load file 
     let object = tobj::load_obj(Path::new("obj/african_head.obj"), true);
+    let texture = image::open(Path::new("tex/african_head_diffuse.tga")).unwrap();
     //let object = tobj::load_obj(&Path::new("obj/teapot.obj"), true);
     //let object = tobj::load_obj(&Path::new("obj/cow.obj"), true);
 
-    render::render(object, WIDTH, HEIGHT, "out/test.png");
+    render::render(object, texture.as_rgb8().unwrap(), WIDTH, HEIGHT, "out/test.png");
 }
 

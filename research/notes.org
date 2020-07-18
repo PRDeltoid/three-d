@@ -1,0 +1,4 @@
+
+* TODO
+** Add barycentric to Triangle2d
+** Add normal/intensity calculations to Triangle3d?

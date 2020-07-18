@@ -6,7 +6,7 @@ pub struct BoundingBox {
 }
 
 /// Find the bounding box of a given triangle formed by 2 screen coordinates (x,y)
-pub fn find_bounding_box(triangle: &Triangle) -> BoundingBox
+pub fn find_bounding_box(triangle: &Triangle2d) -> BoundingBox
 {
     BoundingBox {
         min_values: find_min(&triangle),

@@ -1,5 +1,82 @@
+use core::ops::Index;
 use std::fmt;
 use std::ops;
+
+pub struct Matrix {
+    pub rows: usize,
+    pub cols: usize,
+    data: Vec<f32>
+}
+
+impl Index<usize> for Matrix {
+    type Output = [f32];
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[index * self.cols .. (index+1) * self.cols]
+    }
+
+}
+
+impl ops::IndexMut<usize> for Matrix {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+            &mut self.data[index * self.cols .. (index+1) * self.cols]
+    }
+}
+
+impl ops::Mul<Matrix> for Matrix {
+    type Output = Matrix;
+
+    fn mul(self, rhs: Matrix) -> Matrix {
+        let mut result: Matrix = Matrix::new(self.rows, rhs.cols);
+        for i in 0..self.rows {
+            for j in 0..rhs.cols {
+                result[i][j] = 0.;
+                for k in 0..self.cols {
+                    result[i][j] += self[i][k]*rhs[k][j];
+                }
+            }
+        }
+        result
+    }
+}
+
+impl Matrix {
+    fn new(rows: usize, cols: usize) -> Matrix {
+        Matrix {
+            rows: rows,
+            cols: cols,
+            data: Vec::new()
+        }
+    }
+
+    pub fn to_vec(&self) -> Vec3f {
+        Vec3f {
+            x: self[0][0]/self[3][0],
+            y: self[1][0]/self[3][0],
+            z: self[2][0]/self[3][0]
+        }
+
+    }
+
+    pub fn identity(size: usize) -> Matrix {
+        let mut identity = Matrix { 
+            rows: size,
+            cols: size,
+            data: Vec::new()
+        };
+
+        for i in 0..identity.rows {
+            for j in 0..identity.cols {
+                if i == j {
+                    identity[i][j] = 1.;
+                } else {
+                    identity[i][j] = 0.;
+                }
+            }
+        }
+
+        identity
+    }
+}
 
 #[derive(Clone, Copy)]
 pub struct Vec2f {
@@ -36,6 +113,14 @@ impl Vec3f {
             x: self.x * (1.0 / self.norm()),
             y: self.y * (1.0 / self.norm()),
             z: self.z * (1.0 / self.norm()),
+        }
+    }
+
+    pub fn to_matrix(&self) -> Matrix {
+        Matrix {
+            rows: 4,
+            cols: 1,
+            data: vec!(self.x, self.y, self.z, 1.)
         }
     }
 }

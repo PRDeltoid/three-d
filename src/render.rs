@@ -10,6 +10,22 @@ struct TriangleTexture {
     pub point_3: Vec2f
 }
 
+fn viewport(x: u32, y: u32, width: u32, height: u32) -> Matrix {
+    let mut m: Matrix = Matrix::identity(4);
+    let depth: u32 = 255;
+
+    m[0][3] = (x+width) as f32/2.;
+    m[1][3] = (y+height) as f32/2.;
+    m[2][3] = (depth+width) as f32/2.;
+
+
+    m[0][0] = width as f32/2.;
+    m[1][1] = height as f32/2.;
+    m[2][2] = depth as f32/2.;
+
+    m
+}
+
 /// Render a flat image from a OBJ mesh
 pub fn render(object: Result<(Vec<Model>, Vec<Material>), LoadError>, texture: &RgbImage, width: u32, height: u32, filename: &str) {
     //Unpack the loaded 3d object
@@ -112,8 +128,9 @@ fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle
         return;
     }
     
-    //Default color is black for now, giving the image a greyscale appearance 
+    // When color is black, the image has a greyscale appearance 
     //let color = [255.0,255.0,255.0];
+    // Clown shading (random color per face)
     //color = [rng.gen::<u8>() % 255, rng.gen::<u8>() % 255, rng.gen::<u8>() % 255];
 
     // For each point in the triangle's bounding box, determine if it should be drawn to the image
@@ -134,11 +151,8 @@ fn draw_triangle(buf: &mut image::ImageBuffer<image::Rgb<u8>, Vec<u8>>, triangle
                     x: (weighted_x*texture.width() as f32) as i32,
                     y: (weighted_y*texture.height() as f32) as i32
                 };
-                //println!("{} {}", tex_coords.x, tex_coords.y);
-                let pixel = texture.get_pixel(tex_coords.x as u32, tex_coords.y as u32);
-                [pixel[0] as u8, 
-                pixel[1] as u8,
-                pixel[2] as u8]
+
+                texture.get_pixel(tex_coords.x as u32, tex_coords.y as u32)
             };
 
             // compute the z location of the current pixel we are drawing via interpolation 
